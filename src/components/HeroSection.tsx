@@ -4,243 +4,199 @@ import BinaryPhoto from './BinaryPhoto';
 import { useSound } from '@/hooks/useSound';
 import { useTypewriter } from '@/hooks/useTypewriter';
 
-function MatrixRain() {
+function StaticNoise() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
+    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener('resize', resize);
-
-    const fontSize = 12;
-    let cols = Math.floor(canvas.width / fontSize);
-    const drops: number[] = new Array(cols).fill(1);
-
     const draw = () => {
-      ctx.fillStyle = 'rgba(0,0,0,0.06)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `${fontSize}px "Share Tech Mono", monospace`;
-      cols = Math.floor(canvas.width / fontSize);
-      while (drops.length < cols) drops.push(1);
-
-      for (let i = 0; i < cols; i++) {
-        const ch = Math.random() > 0.5 ? '1' : '0';
-        const alpha = Math.random() * 0.4 + 0.05;
-        ctx.fillStyle = `rgba(0,255,65,${alpha})`;
-        ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
+      const w = canvas.width, h = canvas.height;
+      const img = ctx.createImageData(w, h);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = Math.random() > 0.985 ? Math.floor(Math.random() * 120 + 60) : 0;
+        img.data[i] = img.data[i+1] = img.data[i+2] = v;
+        img.data[i+3] = v > 0 ? 180 : 0;
       }
+      ctx.putImageData(img, 0, 0);
     };
-
-    const id = setInterval(draw, 60);
+    const id = setInterval(draw, 80);
     return () => { clearInterval(id); window.removeEventListener('resize', resize); };
   }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute', inset: 0,
-        width: '100%', height: '100%',
-        opacity: 0.18, pointerEvents: 'none',
-      }}
-    />
+    <canvas ref={canvasRef} style={{
+      position: 'absolute', inset: 0, width: '100%', height: '100%',
+      opacity: 0.35, pointerEvents: 'none',
+    }} />
   );
 }
 
 export default function HeroSection() {
   const { hover, click } = useSound();
-  const { display: subtitle } = useTypewriter(
-    'FULL-STACK DEVELOPER  //  ENGINEER  //  CREATOR',
-    55,
-    600
-  );
+  const { display: role } = useTypewriter('DEVELOPER  //  ENGINEER  //  CREATOR', 55, 800);
 
-  const scrollTo = (id: string) => {
-    click();
-    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollTo = (id: string) => { click(); document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' }); };
 
   return (
-    <section
-      id="home"
-      style={{
-        position: 'relative',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        overflow: 'hidden',
-        paddingTop: 60,
-      }}
-    >
-      <MatrixRain />
+    <section id="home" style={{
+      position: 'relative', minHeight: '100vh',
+      display: 'flex', alignItems: 'center',
+      overflow: 'hidden', paddingTop: 50,
+    }}>
+      <StaticNoise />
 
-      {/* Grid overlay */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: `
-          linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-      }} />
+      {/* Horizontal rule lines ─ Carmen Sandiego map grid feel */}
+      {[20, 40, 60, 80].map(pct => (
+        <div key={pct} style={{
+          position: 'absolute', top: `${pct}%`, left: 0, right: 0,
+          height: 1, background: 'rgba(255,255,255,0.03)', pointerEvents: 'none',
+        }} />
+      ))}
 
       <div style={{
-        maxWidth: 1100, margin: '0 auto', padding: '40px 24px',
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr',
-        gap: 60,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
+        maxWidth: 1100, margin: '0 auto', padding: '60px 28px',
+        display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 64,
+        alignItems: 'center', position: 'relative', zIndex: 1,
       }}>
 
-        {/* Binary photo frame */}
+        {/* ── Dossier photo frame ── */}
         <div style={{ position: 'relative' }}>
+          {/* Outer double-line frame */}
           <div style={{
-            position: 'absolute', inset: -3,
-            border: '2px solid var(--t-green)',
-            boxShadow: '0 0 20px rgba(0,255,65,0.3), inset 0 0 20px rgba(0,255,65,0.05)',
-            animation: 'pulse 3s ease-in-out infinite',
+            position: 'absolute', inset: -10,
+            border: '2px solid #ffffff',
+            boxShadow: '0 0 0 1px #000, 0 0 0 2px #333',
           }} />
-          {/* Corner decorators */}
+          {/* Corner labels */}
           {[
-            { top: -8, left: -8 }, { top: -8, right: -8 },
-            { bottom: -8, left: -8 }, { bottom: -8, right: -8 },
-          ].map((pos, i) => (
-            <div key={i} style={{
-              position: 'absolute', ...pos,
-              width: 14, height: 14,
-              background: 'var(--t-amber)',
-              zIndex: 2,
-            }} />
+            { top: -22, left: -6, text: '╔' },
+            { top: -22, right: -6, text: '╗' },
+            { bottom: -22, left: -6, text: '╚' },
+            { bottom: -22, right: -6, text: '╝' },
+          ].map((c, i) => (
+            <span key={i} style={{
+              position: 'absolute', ...c,
+              fontFamily: 'monospace', fontSize: 16,
+              color: '#ffffff', lineHeight: 1,
+            }}>{c.text}</span>
           ))}
-          <BinaryPhoto
-            src="/images/ulvie-headshot.jpg"
-            size={300}
-            cellSize={6}
-            style={{ animation: 'glitchImg 6s ease-in-out infinite' }}
-          />
+
+          <BinaryPhoto src="/images/ulvie-headshot.jpg" size={280} cellSize={6} />
+
+          {/* Label strip below photo */}
+          <div style={{
+            background: '#ffffff', color: '#000000',
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: 7, letterSpacing: 2,
+            padding: '5px 0', textAlign: 'center', marginTop: 2,
+          }}>
+            OPERATIVE — CLASSIFIED
+          </div>
         </div>
 
-        {/* Text content */}
+        {/* ── Dossier text ── */}
         <div>
+          {/* Case header */}
           <div style={{
             fontFamily: '"Share Tech Mono", monospace',
-            fontSize: 12,
-            color: 'var(--t-amber)',
-            marginBottom: 12,
-            letterSpacing: 3,
+            fontSize: 11, color: '#666', letterSpacing: 3,
+            marginBottom: 10,
           }}>
-            &gt; INITIATING PROFILE...
+            ACME DETECTIVE AGENCY  ·  OPERATIVE DOSSIER  ·  REF# UM-2026
           </div>
 
+          {/* Name — glitch style */}
           <h1 style={{
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: 'clamp(22px, 4vw, 40px)',
-            color: 'var(--t-green)',
-            lineHeight: 1.4,
-            marginBottom: 8,
-            animation: 'glitch 5s ease-in-out infinite',
-            textShadow: '0 0 20px rgba(0,255,65,0.4)',
+            fontSize: 'clamp(18px, 3.5vw, 36px)',
+            color: '#ffffff',
+            lineHeight: 1.5,
+            marginBottom: 10,
+            animation: 'glitch 6s ease-in-out infinite',
           }}>
-            ULVIE<br />
-            <span style={{ color: 'var(--t-amber)' }}>MUSTAFA</span>
+            ULVIE<br />MUSTAFA
           </h1>
 
+          {/* Typewriter role */}
           <div style={{
             fontFamily: '"Share Tech Mono", monospace',
-            fontSize: 13,
-            color: 'var(--t-gdim)',
-            marginBottom: 28,
-            minHeight: 22,
-            letterSpacing: 1,
+            fontSize: 13, color: '#888',
+            marginBottom: 30, minHeight: 22, letterSpacing: 1,
           }}>
-            {subtitle}
-            <span className="blink" style={{ color: 'var(--t-green)' }}>█</span>
+            {role}<span className="blink" style={{ color: '#fff' }}>█</span>
           </div>
 
+          {/* Dossier fields */}
           <div style={{
+            border: '1px solid #222',
+            borderTop: '2px solid #ffffff',
+            background: '#0a0a0a',
+            padding: '16px 20px',
+            marginBottom: 32,
             fontFamily: '"Share Tech Mono", monospace',
-            fontSize: 12,
-            color: 'var(--t-text)',
-            marginBottom: 36,
-            lineHeight: 2,
+            fontSize: 12, lineHeight: 2.1,
           }}>
-            <div><span style={{ color: 'var(--t-amber)' }}>AGE</span>     : 16</div>
-            <div><span style={{ color: 'var(--t-amber)' }}>LOCATION</span>: Burgas, Bulgaria</div>
-            <div><span style={{ color: 'var(--t-amber)' }}>SCHOOL</span>  : VSCPI High School</div>
-            <div><span style={{ color: 'var(--t-amber)' }}>STATUS</span>  : <span style={{ color: 'var(--t-green)' }}>SEEKING INTERNSHIP</span></div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            <button
-              className="retro-btn"
-              onMouseEnter={hover}
-              onClick={() => scrollTo('#projects')}
-            >
-              ▶ VIEW PROJECTS
-            </button>
-            <button
-              className="retro-btn-outline"
-              onMouseEnter={hover}
-              onClick={() => scrollTo('#contact')}
-            >
-              ▶ CONTACT ME
-            </button>
-          </div>
-
-          {/* Social links */}
-          <div style={{ marginTop: 28, display: 'flex', gap: 20, alignItems: 'center' }}>
             {[
-              { label: 'GitHub', url: 'https://github.com/UMMustafa23', icon: '⌘' },
-              { label: 'LinkedIn', url: 'https://www.linkedin.com/in/ulvie-mustafa-4115632ba/', icon: '◈' },
-              { label: 'Email', url: 'mailto:ulvie1m@gmail.com', icon: '✉' },
+              ['AGE',      '16'],
+              ['LOCATION', 'BURGAS, BULGARIA'],
+              ['SCHOOL',   'VSCPI HIGH SCHOOL'],
+              ['GRADE',    '10TH → 11TH'],
+              ['STATUS',   'SEEKING INTERNSHIP ◀'],
+            ].map(([k, v]) => (
+              <div key={k} style={{ display: 'flex', gap: 12 }}>
+                <span style={{ color: '#555', minWidth: 90 }}>{k}</span>
+                <span style={{ color: '#aaa' }}>:</span>
+                <span style={{ color: k === 'STATUS' ? '#fff' : '#ccc', fontWeight: k === 'STATUS' ? 'bold' : 'normal' }}>{v}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 }}>
+            <button className="retro-btn" onMouseEnter={hover} onClick={() => scrollTo('#projects')}>
+              ▶ VIEW CASE FILES
+            </button>
+            <button className="retro-btn-outline" onMouseEnter={hover} onClick={() => scrollTo('#contact')}>
+              ▶ OPEN DISPATCH
+            </button>
+          </div>
+
+          {/* Socials */}
+          <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
+            {[
+              { label: 'GITHUB',   url: 'https://github.com/UMMustafa23' },
+              { label: 'LINKEDIN', url: 'https://www.linkedin.com/in/ulvie-mustafa-4115632ba/' },
+              { label: 'EMAIL',    url: 'mailto:ulvie1m@gmail.com' },
             ].map(s => (
-              <a
-                key={s.label}
-                href={s.url}
-                target={s.label !== 'Email' ? '_blank' : undefined}
+              <a key={s.label} href={s.url}
+                target={s.label !== 'EMAIL' ? '_blank' : undefined}
                 rel="noopener noreferrer"
-                onMouseEnter={hover}
-                onClick={() => click()}
+                onMouseEnter={hover} onClick={() => click()}
                 style={{
-                  fontFamily: '"Share Tech Mono", monospace',
-                  fontSize: 11,
-                  color: 'var(--t-dim)',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
+                  fontFamily: '"Share Tech Mono", monospace', fontSize: 11,
+                  color: '#555', textDecoration: 'none', letterSpacing: 1,
                   transition: 'color 0.15s',
                 }}
-                onMouseOver={e => (e.currentTarget.style.color = 'var(--t-green)')}
-                onMouseOut={e => (e.currentTarget.style.color = 'var(--t-dim)')}
+                onMouseOver={e => (e.currentTarget.style.color = '#fff')}
+                onMouseOut={e => (e.currentTarget.style.color = '#555')}
               >
-                <span>{s.icon}</span> {s.label}
+                [ {s.label} ]
               </a>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
       <div style={{
-        position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-        fontFamily: '"Share Tech Mono", monospace', fontSize: 11,
-        color: 'var(--t-dim)', letterSpacing: 2,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+        position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+        fontFamily: '"Share Tech Mono", monospace', fontSize: 10,
+        color: '#444', letterSpacing: 3,
+        animation: 'blink 2.5s ease-in-out infinite',
       }}>
-        <span style={{ animation: 'blink 2s ease-in-out infinite' }}>▼ SCROLL ▼</span>
+        ▼  SCROLL  ▼
       </div>
     </section>
   );

@@ -17,24 +17,15 @@ export default function ContactSection() {
     e.preventDefault();
     click();
     setStatus('sending');
-    // Formspree-compatible endpoint — replace with your own form ID
-    const endpoint = 'https://formspree.io/f/xpwzkvra';
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch('https://formspree.io/f/xpwzkvra', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ name, email, message }),
       });
-      if (res.ok) {
-        setStatus('sent');
-        success();
-        setName(''); setEmail(''); setMessage('');
-      } else {
-        setStatus('error');
-      }
-    } catch {
-      setStatus('error');
-    }
+      if (res.ok) { setStatus('sent'); success(); setName(''); setEmail(''); setMessage(''); }
+      else setStatus('error');
+    } catch { setStatus('error'); }
   };
 
   return (
@@ -42,101 +33,100 @@ export default function ContactSection() {
       id="contact"
       ref={ref as React.RefObject<HTMLElement>}
       className={`section-hidden ${inView ? 'section-visible' : ''}`}
-      style={{ padding: '100px 24px' }}
+      style={{ padding: '100px 28px' }}
     >
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <div className="section-heading">CONTACT</div>
+        <div className="section-heading">DISPATCH</div>
 
         <div style={{
           fontFamily: '"Share Tech Mono", monospace',
-          fontSize: 12, color: 'var(--t-amber)',
-          marginBottom: 32, lineHeight: 1.8,
+          fontSize: 12, color: '#555',
+          marginBottom: 32, lineHeight: 2, letterSpacing: 0.5,
         }}>
-          &gt; OPEN FOR: internships, collaborations, freelance projects<br />
-          &gt; RESPONSE TIME: &lt; 24 hours<br />
-          &gt; PREFERRED: email / LinkedIn
+          &gt; OPEN FOR: internships, collaborations, freelance<br />
+          &gt; RESPONSE TIME: under 24 hours<br />
+          &gt; PREFERRED CHANNEL: email or LinkedIn
         </div>
 
-        {/* Direct links */}
+        {/* Direct contact links */}
         <div style={{
-          display: 'flex', gap: 20, flexWrap: 'wrap',
-          marginBottom: 40,
-          padding: '16px 20px',
-          background: 'var(--t-card)',
-          border: '1px solid var(--t-border)',
+          display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10,
+          marginBottom: 36,
         }}>
           {[
-            { label: '✉ EMAIL',    value: 'ulvie1m@gmail.com',     href: 'mailto:ulvie1m@gmail.com' },
-            { label: '◈ GITHUB',   value: 'UMMustafa23',            href: 'https://github.com/UMMustafa23' },
-            { label: '⊞ LINKEDIN', value: 'ulvie-mustafa',          href: 'https://www.linkedin.com/in/ulvie-mustafa-4115632ba/' },
-            { label: '☏ PHONE',    value: '+359 88 451 7040',       href: 'tel:+359884517040' },
+            { label: 'EMAIL',    value: 'ulvie1m@gmail.com',     href: 'mailto:ulvie1m@gmail.com' },
+            { label: 'GITHUB',   value: 'UMMustafa23',            href: 'https://github.com/UMMustafa23' },
+            { label: 'LINKEDIN', value: 'ulvie-mustafa',          href: 'https://www.linkedin.com/in/ulvie-mustafa-4115632ba/' },
+            { label: 'PHONE',    value: '+359 88 451 7040',       href: 'tel:+359884517040' },
           ].map(l => (
             <a
               key={l.label}
               href={l.href}
               target={l.href.startsWith('http') ? '_blank' : undefined}
               rel="noopener noreferrer"
-              onMouseEnter={hover}
-              onClick={() => click()}
+              onMouseEnter={hover} onClick={() => click()}
               style={{
-                fontFamily: '"Share Tech Mono", monospace',
+                display: 'block',
+                border: '1px solid #222',
+                borderTop: '2px solid #444',
+                background: '#080808',
+                padding: '12px 16px',
                 textDecoration: 'none',
-                color: 'var(--t-text)',
-                transition: 'color 0.15s',
+                transition: 'border-top-color 0.15s, background 0.15s',
               }}
-              onMouseOver={e => (e.currentTarget.style.color = 'var(--t-green)')}
-              onMouseOut={e => (e.currentTarget.style.color = 'var(--t-text)')}
+              onMouseOver={e => {
+                (e.currentTarget as HTMLElement).style.borderTopColor = '#fff';
+                (e.currentTarget as HTMLElement).style.background = '#0d0d0d';
+              }}
+              onMouseOut={e => {
+                (e.currentTarget as HTMLElement).style.borderTopColor = '#444';
+                (e.currentTarget as HTMLElement).style.background = '#080808';
+              }}
             >
-              <span style={{ color: 'var(--t-amber)' }}>{l.label}</span>
-              <br />
-              <span style={{ fontSize: 12 }}>{l.value}</span>
+              <div style={{ fontFamily: '"Share Tech Mono"', fontSize: 10, color: '#555', marginBottom: 4, letterSpacing: 1 }}>
+                {l.label}
+              </div>
+              <div style={{ fontFamily: '"Share Tech Mono"', fontSize: 12, color: '#ccc' }}>
+                {l.value}
+              </div>
             </a>
           ))}
         </div>
 
         {/* Terminal form */}
-        <div className="terminal-window" style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{ border: '1px solid #333', background: '#060606' }}>
           {/* Title bar */}
           <div style={{
-            background: 'var(--t-gdark)',
-            padding: '8px 16px',
-            display: 'flex', alignItems: 'center', gap: 8,
-            borderBottom: '1px solid var(--t-border)',
+            background: '#fff', color: '#000',
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: 8, letterSpacing: 2,
+            padding: '7px 14px',
+            display: 'flex', justifyContent: 'space-between',
           }}>
-            {['#FF5F57','#FEBC2E','#28C840'].map((c, i) => (
-              <div key={i} style={{ width: 10, height: 10, background: c, borderRadius: '50%' }} />
-            ))}
-            <span style={{
-              fontFamily: '"Share Tech Mono", monospace',
-              fontSize: 11, color: 'var(--t-dim)', marginLeft: 8,
-            }}>
-              send_message.exe
-            </span>
+            <span>SEND DISPATCH</span>
+            <span>send_message.exe</span>
           </div>
 
           <form onSubmit={handleSubmit} style={{ padding: 24 }}>
             {status === 'sent' ? (
               <div style={{
+                textAlign: 'center', padding: '30px 0',
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: 11, color: 'var(--t-green)',
-                lineHeight: 2, textAlign: 'center', padding: '20px 0',
+                fontSize: 10, color: '#fff', lineHeight: 2.5,
               }}>
-                <div style={{ fontSize: 24, marginBottom: 12 }}>✓</div>
                 MESSAGE TRANSMITTED<br />
-                <span style={{ color: 'var(--t-amber)', fontSize: 9 }}>
-                  EXPECT A REPLY WITHIN 24HRS
-                </span>
+                <span style={{ fontSize: 8, color: '#666' }}>EXPECT REPLY WITHIN 24 HRS</span>
               </div>
             ) : (
               <>
                 {[
-                  { label: 'NAME', value: name, onChange: setName, type: 'text', placeholder: 'Your name' },
-                  { label: 'EMAIL', value: email, onChange: setEmail, type: 'email', placeholder: 'your@email.com' },
+                  { label: 'AGENT NAME', value: name, set: setName, type: 'text', ph: 'Your name' },
+                  { label: 'FREQUENCY (EMAIL)', value: email, set: setEmail, type: 'email', ph: 'your@email.com' },
                 ].map(f => (
                   <div key={f.label} style={{ marginBottom: 22 }}>
                     <div style={{
                       fontFamily: '"Share Tech Mono", monospace',
-                      fontSize: 12, color: 'var(--t-amber)', marginBottom: 6,
+                      fontSize: 11, color: '#555', marginBottom: 6, letterSpacing: 1,
                     }}>
                       &gt; {f.label}:
                     </div>
@@ -145,16 +135,16 @@ export default function ContactSection() {
                       type={f.type}
                       required
                       value={f.value}
-                      onChange={e => { f.onChange(e.target.value); typeKey(); }}
-                      placeholder={f.placeholder}
+                      onChange={e => { f.set(e.target.value); typeKey(); }}
+                      placeholder={f.ph}
                     />
                   </div>
                 ))}
 
-                <div style={{ marginBottom: 28 }}>
+                <div style={{ marginBottom: 26 }}>
                   <div style={{
                     fontFamily: '"Share Tech Mono", monospace',
-                    fontSize: 12, color: 'var(--t-amber)', marginBottom: 6,
+                    fontSize: 11, color: '#555', marginBottom: 6, letterSpacing: 1,
                   }}>
                     &gt; MESSAGE:
                   </div>
@@ -172,9 +162,9 @@ export default function ContactSection() {
                 {status === 'error' && (
                   <div style={{
                     fontFamily: '"Share Tech Mono", monospace',
-                    fontSize: 12, color: '#FF4444', marginBottom: 16,
+                    fontSize: 12, color: '#888', marginBottom: 14,
                   }}>
-                    ERROR: Message failed to send. Try email directly.
+                    TRANSMISSION FAILED. TRY EMAIL DIRECTLY.
                   </div>
                 )}
 
@@ -185,7 +175,7 @@ export default function ContactSection() {
                   disabled={status === 'sending'}
                   style={{ width: '100%', textAlign: 'center' }}
                 >
-                  {status === 'sending' ? '▶ TRANSMITTING...' : '▶▶ SEND MESSAGE ◀◀'}
+                  {status === 'sending' ? '▶ TRANSMITTING...' : '▶▶  SEND DISPATCH  ◀◀'}
                 </button>
               </>
             )}
@@ -194,20 +184,20 @@ export default function ContactSection() {
 
         {/* Footer */}
         <div style={{
-          marginTop: 60,
-          borderTop: '1px solid var(--t-border)',
-          paddingTop: 20,
+          marginTop: 56, borderTop: '1px solid #1a1a1a', paddingTop: 20,
           textAlign: 'center',
           fontFamily: '"Share Tech Mono", monospace',
-          fontSize: 11,
-          color: 'var(--t-dim)',
-          lineHeight: 2,
+          fontSize: 11, color: '#333', lineHeight: 2,
         }}>
-          <div style={{ color: 'var(--t-gdim)', marginBottom: 4, fontFamily: '"Press Start 2P"', fontSize: 8 }}>
-            ULVIE.EXE v2.6.19
+          <div style={{
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: 7, color: '#444',
+            letterSpacing: 3, marginBottom: 6,
+          }}>
+            ACME DETECTIVE AGENCY  ·  OPERATIVE: ULVIE MUSTAFA
           </div>
-          Built with Next.js · Designed by Ulvie Mustafa · 2026<br />
-          <span style={{ color: 'var(--t-green)' }}>Burgas, Bulgaria</span>
+          Built with Next.js  ·  Burgas, Bulgaria  ·  2026<br />
+          <span style={{ color: '#fff', fontSize: 10 }}>ulvie1m@gmail.com</span>
         </div>
       </div>
     </section>
