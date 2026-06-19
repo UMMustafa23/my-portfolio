@@ -111,8 +111,8 @@ export default function AboutSection() {
               YOUTH TECHNICAL CREATIVITY — 2025
             </div>
             <Image
-              src="/images/ulvie-competition.jpg"
-              alt="Ulvie at competition holding diploma"
+              src="/images/arduino-project.jpg"
+              alt="Ulvie with Arduino smart watering system project"
               width={500} height={300}
               style={{
                 width: '100%', height: 210,
