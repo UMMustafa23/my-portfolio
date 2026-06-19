@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import BinaryPhoto from './BinaryPhoto';
+import Image from 'next/image';
 import { useSound } from '@/hooks/useSound';
 import { useTypewriter } from '@/hooks/useTypewriter';
 
@@ -85,7 +85,28 @@ export default function HeroSection() {
             }}>{c.text}</span>
           ))}
 
-          <BinaryPhoto src="/images/ulvie-headshot.jpg" size={280} cellSize={6} />
+          <div style={{ position: 'relative', width: 240, height: 320, overflow: 'hidden' }}>
+            <Image
+              src="/images/ulvie-headshot.jpg"
+              alt="Ulvie Mustafa"
+              fill
+              style={{
+                objectFit: 'cover',
+                objectPosition: 'center top',
+                filter: 'grayscale(100%) contrast(1.2) brightness(1.05)',
+              }}
+            />
+            {/* CRT scanlines */}
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0.18) 4px)',
+            }} />
+            {/* Vignette */}
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)',
+            }} />
+          </div>
 
           {/* Label strip below photo */}
           <div style={{
