@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useSound } from '@/hooks/useSound';
 import { useInView } from '@/hooks/useInView';
+import Lightbox from './Lightbox';
 
 const PROJECTS = [
   {
@@ -37,7 +38,12 @@ const PROJECTS = [
     stack: ['Node.js', 'MongoDB', 'React', 'DeepSeek API'],
     desc: 'Cross-platform application helping students who are undecided about their academic major. Uses AI personality and skills assessment to recommend career paths.',
     url: 'https://github.com/UMMustafa23/PathAI',
-    screenshots: ['/images/pathai-assessment.png', '/images/pathai-dashboard.png', '/images/pathai-results.png'],
+    screenshots: [
+      '/images/pathai-assessment.png',
+      '/images/pathai-dashboard.png',
+      '/images/pathai-results.png',
+      '/images/pathai-presentation.jpg',
+    ],
     tags: ['AI', 'FULL-STACK', 'EDUCATION'],
     current: false,
   },
@@ -49,7 +55,7 @@ const PROJECTS = [
     stack: ['C++', 'MSSQL', 'Raylib', 'Wikipedia API'],
     desc: 'Wikipedia-based student–teacher knowledge app. Teachers assign topics; students explore and are tested on content fetched live from the Wikipedia API.',
     url: 'https://github.com/codingburgas/2nd-sprint-10th-grade-troy',
-    screenshots: [],
+    screenshots: ['/images/troy-main.png'],
     tags: ['C++', 'DESKTOP', 'EDUCATION'],
     current: false,
   },
@@ -61,7 +67,7 @@ const PROJECTS = [
     stack: ['C++', 'Raylib'],
     desc: 'Maze game where the player controls a farmer navigating procedurally generated fields to collect seeds. Built from scratch with collision detection and item spawning.',
     url: 'https://github.com/UMMustafa23/sprint-10th-grade-no-way-out',
-    screenshots: ['/images/seedsearch.png'],
+    screenshots: ['/images/seedsearch.png', '/images/seedsearch-award.jpg'],
     tags: ['GAME DEV', 'C++', 'GRAPHICS'],
     current: false,
   },
@@ -81,13 +87,14 @@ const PROJECTS = [
 
 export default function ProjectsSection() {
   const [active, setActive] = useState(0);
-  const [imgIdx, setImgIdx] = useState(0);
+  const [lightbox, setLightbox] = useState<{ open: boolean; idx: number }>({ open: false, idx: 0 });
   const { hover, click } = useSound();
   const { ref, inView } = useInView();
   const proj = PROJECTS[active];
   const shots = proj.screenshots;
 
-  const selectProject = (i: number) => { click(); setActive(i); setImgIdx(0); };
+  const openLightbox = (idx: number) => { click(); setLightbox({ open: true, idx }); };
+  const closeLightbox = () => setLightbox({ open: false, idx: 0 });
 
   return (
     <section
@@ -96,13 +103,22 @@ export default function ProjectsSection() {
       className={`section-hidden ${inView ? 'section-visible' : ''}`}
       style={{ padding: '100px 28px', background: 'rgba(10,10,10,0.6)' }}
     >
+      {lightbox.open && (
+        <Lightbox
+          images={shots}
+          index={lightbox.idx}
+          alt={`${proj.name} screenshot`}
+          onClose={closeLightbox}
+          onChange={idx => setLightbox({ open: true, idx })}
+        />
+      )}
+
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div className="section-heading">CASE FILES</div>
 
         <div style={{
           fontFamily: '"Share Tech Mono", monospace',
-          fontSize: 12, color: '#666',
-          marginBottom: 24, letterSpacing: 1,
+          fontSize: 12, color: '#666', marginBottom: 24, letterSpacing: 1,
         }}>
           &gt; SELECT A CASE FILE TO REVIEW:
         </div>
@@ -124,7 +140,7 @@ export default function ProjectsSection() {
               <div
                 key={p.id}
                 className={`case-card${active === i ? ' active' : ''}`}
-                onClick={() => selectProject(i)}
+                onClick={() => { click(); setActive(i); setLightbox({ open: false, idx: 0 }); }}
                 onMouseEnter={hover}
                 style={{ borderBottom: '1px solid #1a1a1a' }}
               >
@@ -167,8 +183,7 @@ export default function ProjectsSection() {
               {proj.current && (
                 <span style={{
                   fontFamily: '"Share Tech Mono"', fontSize: 10,
-                  color: '#fff', border: '1px solid #fff', padding: '2px 8px',
-                  letterSpacing: 1,
+                  color: '#fff', border: '1px solid #fff', padding: '2px 8px', letterSpacing: 1,
                 }}>
                   ● IN PROGRESS
                 </span>
@@ -189,43 +204,63 @@ export default function ProjectsSection() {
               {proj.desc}
             </p>
 
-            {/* Screenshots */}
+            {/* Screenshots grid */}
             {shots.length > 0 && (
               <div style={{ marginBottom: 22 }}>
-                <div style={{ position: 'relative', border: '1px solid #2a2a2a', overflow: 'hidden', maxWidth: 320 }}>
+                <div style={{
+                  fontFamily: '"Share Tech Mono"', fontSize: 10, color: '#444',
+                  letterSpacing: 2, marginBottom: 8,
+                }}>
+                  // EVIDENCE  <span style={{ color: '#333' }}>— CLICK IMAGE TO EXPAND</span>
+                </div>
+
+                {/* Main screenshot */}
+                <div
+                  onClick={() => openLightbox(0)}
+                  style={{
+                    position: 'relative', border: '1px solid #2a2a2a',
+                    overflow: 'hidden', maxWidth: 320,
+                    cursor: 'zoom-in', marginBottom: shots.length > 1 ? 6 : 0,
+                  }}
+                >
                   <Image
-                    key={shots[imgIdx]}
-                    src={shots[imgIdx]}
+                    src={shots[0]}
                     alt={`${proj.name} screenshot`}
                     width={320} height={200}
                     style={{
                       width: '100%', height: 200, objectFit: 'cover',
                       filter: 'grayscale(100%) contrast(1.1)',
                       display: 'block',
+                      transition: 'filter 0.2s',
                     }}
+                    onMouseOver={e => (e.currentTarget.style.filter = 'grayscale(50%) contrast(1.1)')}
+                    onMouseOut={e => (e.currentTarget.style.filter = 'grayscale(100%) contrast(1.1)')}
                   />
                   <div style={{
-                    position: 'absolute', inset: 0,
+                    position: 'absolute', inset: 0, pointerEvents: 'none',
                     background: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.1) 3px,rgba(0,0,0,0.1) 4px)',
-                    pointerEvents: 'none',
                   }} />
                 </div>
+
                 {/* Thumbnail strip for multiple screenshots */}
                 {shots.length > 1 && (
-                  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {shots.map((s, i) => (
                       <div
                         key={i}
-                        onClick={() => { click(); setImgIdx(i); }}
+                        onClick={() => openLightbox(i)}
                         onMouseEnter={hover}
                         style={{
-                          width: 48, height: 32, cursor: 'pointer',
-                          border: `1px solid ${imgIdx === i ? '#fff' : '#2a2a2a'}`,
+                          width: 52, height: 36, cursor: 'zoom-in',
+                          border: '1px solid #2a2a2a',
                           overflow: 'hidden', flexShrink: 0,
+                          transition: 'border-color 0.15s',
                         }}
+                        onMouseOver={e => ((e.currentTarget as HTMLElement).style.borderColor = '#fff')}
+                        onMouseOut={e => ((e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a')}
                       >
                         <Image
-                          src={s} alt="" width={48} height={32}
+                          src={s} alt="" width={52} height={36}
                           style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)' }}
                         />
                       </div>

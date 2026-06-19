@@ -30,23 +30,57 @@ export function useSound() {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + dur);
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     },
     [getCtx]
   );
 
-  const hover   = useCallback(() => tone(440, 0.05, 'square', 0.025), [tone]);
-  const click   = useCallback(() => { tone(880, 0.04, 'square', 0.04); setTimeout(() => tone(660, 0.06, 'square', 0.03), 45); }, [tone]);
-  const typeKey = useCallback(() => tone(180 + Math.random() * 80, 0.025, 'square', 0.018), [tone]);
+  /* Mechanical keyboard/mouse click — white-noise burst with sharp decay */
+  const keyClick = useCallback((vol = 0.28) => {
+    if (!enabledRef.current) return;
+    const ctx = getCtx();
+    if (!ctx) return;
+    try {
+      const dur = 0.045;
+      const bufLen = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        // noise burst that decays very fast — classic key-bottom-out click
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 10);
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+
+      // High-pass to give the clicky "tick" character
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 800;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+
+      src.connect(hp);
+      hp.connect(gain);
+      gain.connect(ctx.destination);
+      src.start();
+    } catch { /* ignore */ }
+  }, [getCtx]);
+
+  const hover   = useCallback(() => tone(600, 0.04, 'square', 0.018), [tone]);
+  const click   = useCallback(() => keyClick(), [keyClick]);
+  const typeKey = useCallback(() => keyClick(0.12), [keyClick]);
   const success = useCallback(() => {
-    [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'square', 0.035), i * 120));
+    [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'square', 0.03), i * 110));
   }, [tone]);
   const boot = useCallback(() => {
-    [150, 200, 280, 360, 480].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'square', 0.03), i * 90));
+    [150, 200, 280, 360, 480].forEach((f, i) => setTimeout(() => tone(f, 0.12, 'square', 0.025), i * 90));
   }, [tone]);
-  const toggle = useCallback(() => { enabledRef.current = !enabledRef.current; return enabledRef.current; }, []);
+  const toggle = useCallback(() => {
+    enabledRef.current = !enabledRef.current;
+    return enabledRef.current;
+  }, []);
 
   return { hover, click, typeKey, success, boot, toggle, isEnabled: enabledRef };
 }

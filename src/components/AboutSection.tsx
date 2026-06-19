@@ -1,6 +1,9 @@
 'use client';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useInView } from '@/hooks/useInView';
+import { useSound } from '@/hooks/useSound';
+import Lightbox from './Lightbox';
 
 const LANGS = [
   { name: 'TURKISH',   pct: 100, note: 'NATIVE' },
@@ -10,6 +13,8 @@ const LANGS = [
 
 export default function AboutSection() {
   const { ref, inView } = useInView();
+  const { click } = useSound();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   return (
     <section
@@ -18,13 +23,22 @@ export default function AboutSection() {
       className={`section-hidden ${inView ? 'section-visible' : ''}`}
       style={{ padding: '100px 28px', maxWidth: 1100, margin: '0 auto' }}
     >
+      {lightboxOpen && (
+        <Lightbox
+          images={['/images/arduino-project.jpg']}
+          index={0}
+          alt="Ulvie with Arduino smart watering system project"
+          onClose={() => setLightboxOpen(false)}
+          onChange={() => {}}
+        />
+      )}
+
       <div className="section-heading">OPERATIVE PROFILE</div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 36, alignItems: 'start' }}>
 
         {/* ── Left: terminal dossier ── */}
         <div>
-          {/* Title bar */}
           <div style={{
             background: '#fff', color: '#000',
             fontFamily: '"Press Start 2P", monospace',
@@ -39,7 +53,6 @@ export default function AboutSection() {
             border: '1px solid #333', borderTop: 'none',
             background: '#0a0a0a', padding: '22px 24px',
           }}>
-            {/* Fields */}
             {[
               ['NAME',     'Ulvie Mustafa'],
               ['AGE',      '16'],
@@ -101,52 +114,68 @@ export default function AboutSection() {
         {/* ── Right: photo + stats ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
 
-          {/* Competition photo */}
+          {/* Competition photo — clickable */}
           <div style={{ border: '1px solid #333', overflow: 'hidden', position: 'relative' }}>
             <div style={{
               background: '#fff', color: '#000',
               fontFamily: '"Press Start 2P", monospace',
               fontSize: 7, letterSpacing: 2, padding: '6px 12px',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
-              YOUTH TECHNICAL CREATIVITY — 2025
+              <span>YOUTH TECHNICAL CREATIVITY — 2025</span>
+              <span style={{ fontSize: 6, color: '#666' }}>CLICK TO EXPAND</span>
             </div>
-            <Image
-              src="/images/arduino-project.jpg"
-              alt="Ulvie with Arduino smart watering system project"
-              width={500} height={300}
-              style={{
-                width: '100%', height: 210,
-                objectFit: 'cover',
-                filter: 'grayscale(100%) contrast(1.15)',
-                display: 'block',
+            <div
+              onClick={() => { click(); setLightboxOpen(true); }}
+              style={{ position: 'relative', cursor: 'zoom-in' }}
+            >
+              <Image
+                src="/images/arduino-project.jpg"
+                alt="Ulvie with Arduino smart watering system project"
+                width={500} height={300}
+                style={{
+                  width: '100%', height: 210,
+                  objectFit: 'cover',
+                  filter: 'grayscale(100%) contrast(1.15)',
+                  display: 'block',
+                  transition: 'filter 0.2s',
+                }}
+                onMouseOver={e => (e.currentTarget.style.filter = 'grayscale(60%) contrast(1.15)')}
+                onMouseOut={e => (e.currentTarget.style.filter = 'grayscale(100%) contrast(1.15)')}
+              />
+              {/* Scanlines */}
+              <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                background: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px)',
+              }} />
+              {/* Zoom hint overlay */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0,0,0,0)',
+                transition: 'background 0.2s',
+                pointerEvents: 'none',
               }}
-            />
-            {/* Scanline overlay on photo */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px)',
-              pointerEvents: 'none',
-            }} />
+                className="photo-hover-overlay"
+              />
+            </div>
           </div>
 
           {/* Stat grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
-              { label: 'PROJECTS',  value: '4+' },
+              { label: 'PROJECTS',  value: '6+' },
               { label: 'CERTS',     value: '6'  },
               { label: 'LANGUAGES', value: '3'  },
               { label: 'YRS EXP',   value: '3+' },
             ].map(f => (
               <div key={f.label} style={{
-                border: '1px solid #222',
-                background: '#0a0a0a',
-                padding: '16px 12px',
-                textAlign: 'center',
+                border: '1px solid #222', background: '#0a0a0a',
+                padding: '16px 12px', textAlign: 'center',
               }}>
                 <div style={{
                   fontFamily: '"Press Start 2P", monospace',
-                  fontSize: 26, color: '#ffffff',
-                  marginBottom: 6,
+                  fontSize: 26, color: '#ffffff', marginBottom: 6,
                 }}>
                   {f.value}
                 </div>
