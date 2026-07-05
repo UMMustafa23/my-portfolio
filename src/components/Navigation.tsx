@@ -18,8 +18,24 @@ export default function Navigation() {
   const { hover, click, toggle } = useSound();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      // Scroll spy — highlight the link of the section currently on screen
+      const probe = window.scrollY + window.innerHeight * 0.35;
+      let current = LINKS[0].label;
+      for (const l of LINKS) {
+        const el = document.querySelector<HTMLElement>(l.href);
+        if (el && el.offsetTop <= probe) current = l.label;
+      }
+      // At the very bottom of the page, force the last section active
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        current = LINKS[LINKS.length - 1].label;
+      }
+      setActive(current);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 

@@ -9,14 +9,17 @@ const PROJECTS = [
   {
     id: '01',
     name: 'AIBEST TECH',
-    year: 'IN PROGRESS',
-    status: 'IN PROGRESS',
+    year: 'JUL 2026',
+    status: '3RD PLACE 🏆',
     stack: ['React', 'Node.js', 'MongoDB'],
-    desc: 'Event management and notification center for the AIBEST Tech Academy hackathon held in Burgas. Handles registrations, scheduling, and real-time event notifications for participants.',
-    url: null,
-    screenshots: ['/images/aibest-menu.png'],
-    tags: ['HACKATHON', 'EVENT MGMT', 'FULL-STACK'],
-    current: true,
+    desc: 'Event management and notification center for the AIBEST Tech Academy hackathon held in Burgas. Handles registrations, scheduling, and real-time event notifications for participants. Awarded 3rd place at AIBEST Tech Academy — built as my graduation project for the practice work program.',
+    links: [
+      { label: 'CLIENT REPO', url: 'https://github.com/UMMustafa23/aibest-persey-client' },
+      { label: 'SERVICE REPO', url: 'https://github.com/UMMustafa23/aibest-persey-service' },
+    ],
+    screenshots: ['/images/aibest-menu.png', '/images/aibest-3rd-place.jpg'],
+    tags: ['HACKATHON', 'EVENT MGMT', 'FULL-STACK', 'AWARD'],
+    current: false,
   },
   {
     id: '02',
@@ -25,7 +28,7 @@ const PROJECTS = [
     status: 'IN PROGRESS',
     stack: ['React', 'Node.js', 'Database'],
     desc: 'Cinema ticketing system with seat selection, booking management, and scheduling. Allows users to browse movies, select seats, and purchase tickets with a clean interface.',
-    url: null,
+    links: [],
     screenshots: ['/images/cinema-menu.png'],
     tags: ['TICKETING', 'UI/UX', 'FULL-STACK'],
     current: true,
@@ -37,7 +40,7 @@ const PROJECTS = [
     status: 'DEPLOYED',
     stack: ['Node.js', 'MongoDB', 'React', 'DeepSeek API'],
     desc: 'Cross-platform application helping students who are undecided about their academic major. Uses AI personality and skills assessment to recommend career paths.',
-    url: 'https://github.com/UMMustafa23/PathAI',
+    links: [{ label: 'VIEW ON GITHUB', url: 'https://github.com/UMMustafa23/PathAI' }],
     screenshots: [
       '/images/pathai-assessment.png',
       '/images/pathai-dashboard.png',
@@ -54,7 +57,7 @@ const PROJECTS = [
     status: 'RELEASED',
     stack: ['C++', 'MSSQL', 'Raylib', 'Wikipedia API'],
     desc: 'Wikipedia-based student–teacher knowledge app. Teachers assign topics; students explore and are tested on content fetched live from the Wikipedia API.',
-    url: 'https://github.com/codingburgas/2nd-sprint-10th-grade-troy',
+    links: [{ label: 'VIEW ON GITHUB', url: 'https://github.com/codingburgas/2nd-sprint-10th-grade-troy' }],
     screenshots: ['/images/troy-main.png'],
     tags: ['C++', 'DESKTOP', 'EDUCATION'],
     current: false,
@@ -66,8 +69,8 @@ const PROJECTS = [
     status: 'RELEASED',
     stack: ['C++', 'Raylib'],
     desc: 'Maze game where the player controls a farmer navigating procedurally generated fields to collect seeds. Built from scratch with collision detection and item spawning.',
-    url: 'https://github.com/UMMustafa23/sprint-10th-grade-no-way-out',
-    screenshots: ['/images/seedsearch.png', '/images/seedsearch-award.jpg'],
+    links: [{ label: 'VIEW ON GITHUB', url: 'https://github.com/UMMustafa23/sprint-10th-grade-no-way-out' }],
+    screenshots: ['/images/seedsearch-award.jpg', '/images/seedsearch.png'],
     tags: ['GAME DEV', 'C++', 'GRAPHICS'],
     current: false,
   },
@@ -78,7 +81,7 @@ const PROJECTS = [
     status: 'BUILT',
     stack: ['Arduino', 'C', 'Sensors'],
     desc: 'Automated smart plant watering system using soil moisture sensors and a water pump. Monitors humidity and waters only when needed — no human intervention required.',
-    url: null,
+    links: [],
     screenshots: ['/images/arduino-project.jpg'],
     tags: ['ARDUINO', 'IoT', 'HARDWARE'],
     current: false,
@@ -285,11 +288,15 @@ export default function ProjectsSection() {
               </div>
             </div>
 
-            {proj.url ? (
-              <a href={proj.url} target="_blank" rel="noopener noreferrer"
-                className="retro-btn" onMouseEnter={hover} onClick={() => click()}>
-                ▶ VIEW ON GITHUB
-              </a>
+            {proj.links.length > 0 ? (
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {proj.links.map(l => (
+                  <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer"
+                    className="retro-btn" onMouseEnter={hover} onClick={() => click()}>
+                    ▶ {l.label}
+                  </a>
+                ))}
+              </div>
             ) : (
               <span style={{ fontFamily: '"Share Tech Mono"', fontSize: 11, color: '#444' }}>
                 {proj.current ? '// Repository will be public after completion' : '// Hardware project — no repository'}

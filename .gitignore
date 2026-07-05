@@ -29,6 +29,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Claude Code local config
+.claude/
+
 # Next.js cache
 .next/cache
 next-env.d.ts
